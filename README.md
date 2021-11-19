@@ -1,0 +1,2 @@
+# Typora
+My learning note
