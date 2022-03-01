@@ -252,7 +252,7 @@ func NewBucketWithQuantum(fillInterval time.Duration, capacity, quantum int64) *
 
 - #### 按照提供的比例，每秒钟填充令牌数。例如 capacity 是100，而 rate 是 0.1，那么每秒会填充10个令牌。
 
-```golang
+```　golang
 func NewBucketWithRate(rate float64, capacity int64) *Bucket
 复制代码
 ```
