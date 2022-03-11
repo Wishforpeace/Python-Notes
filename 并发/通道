@@ -1,0 +1,122 @@
+# 通道
+
+## 一、创建chan
+
+### 1、无缓存的chan
+
+```go
+// 1.使用内置的make
+ch1 := make(chan int)
+var ch2 chan int
+
+// 2.声明只读通道
+ch2 := make(<-chan string)
+var ch3 <- chan int
+
+// 3.声明只写通道
+ch3 := make(chan<- string)
+var ch2 chan <- int
+```
+
+**注意**： 如果没有指定是写通道还是读通道，默认的是双向的，可读可写
+
+把数据往通道中发送，如果接收方一周都没接收，那么发送操作将会持续阻塞。
+
+### 2、有缓存的chan
+
+```go
+ch1 := make(chan int,capacity)  // capacity:容量
+
+    当capacity=0的时候，channel是无缓冲阻塞读写的,
+    当capacity>0时，channel是有缓冲的，是非阻塞的，直到写满capacity个元素才阻塞写入
+ch2 := make(chan int) // 相当于ch2 := make(chan int 0),capacity为0
+/声明带10个缓冲的通道
+ch3 := make(chan string,10)
+```
+
++ 写入的数据大于capacity，就会出现报错；
++ `len(ch)`表示缓存的数据个数，即chan的元素个数，如果读出一个，`len(ch)`将会减1
++ 通过`cap`函数得到channel的缓存长度
+
+`fatal error:all groutines are asleep - deadback!`
+
++ 当缓存满时，发送消息会阻塞
++ 当channel为空时，读取操作会阻塞
+
+### 3、无缓存和缓存的区别
+
++ 无缓存的chan，chan为空，读取阻塞，chan不为空，写入阻塞，只能为一个；
++ 有缓存的chan，缓存写满，再写入，会阻塞，chan为空，读取阻塞。
+
+## 二、关闭通道
+
+```go
+ch := make(chan int)
+defer ch close
+```
+
+**注意**
+
++ 关闭一个未初始化的channel会产生panic
+
+```go
+var ch chan int
+defer close(ch)
+
+panic: close of nil channel
+// 此时的chan是nil，未初始化
+ch := make(chan int) // 分配内存，no problem
+```
+
+
+
++ 重复关闭同一个channel，会产生panic
+
+```go
+ch := make(chan int)
+
+defer close(ch)
+defer close(ch)
+
+panic: close of closed channel
+// 已经关闭的channel无法重复关闭
+
+```
+
++ 已经关闭的channel，不能在写入数据
+
+```go
+ch :=make(chan int)
+defer close(ch)
+ch <- 3
+fatal error:all goroutines are asleep - deadlock!
+```
+
++ 从已经关闭的channel中读取消息，不会产生panic，且能够读出channel中未读出的数据；
++ 关闭channel，会产生一个广播机制，所有向channel读取消息的goroutines都会收到消息。
+
+```go
+ch := make(chan int,3)
+ch <- 1
+ch <- 2
+ch <- 3
+
+close(ch)
+
+for x:= range ch{
+	fmt.Println(x)
+}
+
+x,ok := <-ch
+fmt.Println(x,ok)
+
+// 注意这里不能用defer close，会报错
+fatal error:all goroutines are asleep - deadback！
+
+defer 是在程序最后执行的，还没有关闭，就先从goroutines中读取，是不可行的
+```
+
+
+
+
+
