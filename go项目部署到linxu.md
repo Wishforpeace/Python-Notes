@@ -8,7 +8,9 @@
 
 一、直接部署到linux
 
-\1. 在mac上, 进入到项目目录, 执行以下命令, 进行编译: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build main.go, 生成一个main文件. 
+\1. 在mac上, 进入到项目目录, 执行以下命令CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build main.go
+
+, 进行编译: , 生成一个main文件. 
 
 \2. 将main文件上传到linux任意目录下, 执行 nohup ./main &运行项目. 如果出错, 则查看日志即可
 

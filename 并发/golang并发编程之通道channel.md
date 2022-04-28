@@ -78,7 +78,7 @@ func main(){
 	go send()
 	fmt.Println("wait...")
 	value := <-value
-	fmt.Println("receiver:%v\n",value)
+	fmt.Pri˜ntln("receiver:%v\n",value)
 	fmt.Println("end...")
 }
 ```
